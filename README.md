@@ -25,3 +25,5 @@ cp secret.json.example secret.json
 # Sunday at 1AM:                     0 1 * * 0
 # First day of the month at 3:20PM: 20 15 1 * *
 ```
+
+![image](https://user-images.githubusercontent.com/31943163/209423181-3d78b869-2524-47d1-b32e-48fa20320122.png)
