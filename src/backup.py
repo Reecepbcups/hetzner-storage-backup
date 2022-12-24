@@ -41,6 +41,8 @@ class Backup:
         self.root_paths = CONFIG['backups']['parent-paths']        
         self.backup_path = CONFIG['backups']['save-location']
         self.max_local_backups = CONFIG['backups']['max-local-backups']
+        if self.max_local_backups <= 0:
+            self.max_local_backups = 0            
 
         # make directory if it doesn't exist
         if not os.path.exists(self.backup_path):
@@ -52,7 +54,7 @@ class Backup:
                 
         self.zipfilename = f"{getCurrentHostname()}_{self.current_time}.zip"
         self.backup_file_name = os.path.join(self.backup_path, self.zipfilename)
-        self.log_filename = os.path.join(self.backup_path, f"{getCurrentHostname()}_{self.current_time}.log")
+        # self.log_filename = os.path.join(self.backup_path, f"{getCurrentHostname()}_{self.current_time}.log")
         
 
     def backup_mongodb(self, mongoDBConfig):
@@ -76,15 +78,16 @@ class Backup:
         # exit(0)
 
 
-    def _delete_oldest_file_in_dir(self):
+    def delete_oldest_files_in_dir_if_over_max(self):
         # Remove oldest backup so we don't store too many
-        list_of_backups = os.listdir(self.backup_path) 
-        # print(list_of_backups) 
-        full_paths = [f"{os.path.join(self.backup_path, x)}" for x in list_of_backups]
+        list_of_backups = os.listdir(self.backup_path)         
+
         if len(list_of_backups) > self.max_local_backups:
-            oldest_file = min(full_paths, key=os.path.getctime)
-            os.remove(oldest_file)
-            # cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
+            for i in range(len(list_of_backups) - self.max_local_backups):
+                full_paths = [f"{os.path.join(self.backup_path, x)}" for x in os.listdir(self.backup_path)]                
+                oldest_file = min(full_paths, key=os.path.getctime)
+                os.remove(oldest_file)
+                cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
 
     def zip_files(self):
         # ! IMPORTANT: Switch to https://pypi.org/project/aiozipstream/
@@ -125,11 +128,12 @@ class Backup:
                         if self.debug and self.showSuccess:
                             # cprint(f"&a{relative_filename}")
                             text_output += f"&a{relative_filename}\n"
-                        log += f"+ {abs_path}\n"             
+                        log += f"+ {abs_path}\n"
                     else:
                         if self.debug and self.showIgnored: 
                             # cprint(f"&c{relative_filename} is being ignored")
-                            text_output += f"&c{relative_filename} ignored\n"
+                            if 'node_modules' not in abs_path:
+                                text_output += f"&c{relative_filename} ignored\n"
                         if 'node_modules' not in abs_path:
                             log += f"- {abs_path}\n"
                         
@@ -139,18 +143,16 @@ class Backup:
                             
         self.zip_file.close()
 
-        # save log to backups folder self.log_filename
-        with open(self.log_filename, 'w') as f:
-            f.write(log)            
+        # save log to backups folder self.log_filename. Pretty sure this breaks cleaning up old files
+        # with open(self.log_filename, 'w') as f:
+        #     f.write(log)            
         
         # delete folder self.mongodb_abs_location
         if(mongoConfig['enabled']):
             if len(self.mongodb_abs_location) > 3:
                 shutil.rmtree(self.mongodb_abs_location)
             else:
-                print(f"Safety check hit, can't delete {self.mongodb_abs_location}")
-
-        self._delete_oldest_file_in_dir()
+                print(f"Safety check hit, can't delete {self.mongodb_abs_location}")        
 
         # if there is a discord webhook, then send a notification.
         if len(self.discord_webhook) > 0:

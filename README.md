@@ -18,6 +18,7 @@ cp secret.json.example secret.json
 
 
 # BE SURE TO RUN THIS FROM THE ROOT OF WHAT YOU SET 'save-location' IN THE CONFIG
+# EDITOR=nano crontab -e
 0 2 * * * /usr/bin/python3 /root/hetzner-storage-backup/src/main.py
 
 # Run every night at 2am:            0 2 * * *
