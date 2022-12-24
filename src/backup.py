@@ -1,6 +1,5 @@
 from config import CONFIG
-from cosmetics import cinput, cprint
-from pick import pick
+from cosmetics import cprint
 
 from system import getStorageAmount, getRamUsage, getCurrentHostname
 
@@ -39,7 +38,7 @@ class Backup:
             cprint("&cNo backup section in config, grab example from 'secret.json.example'")
             exit(0)
 
-        self.root_paths = CONFIG['backups']['parent-paths']
+        self.root_paths = CONFIG['backups']['parent-paths']        
         self.backup_path = CONFIG['backups']['save-location']
         self.max_local_backups = CONFIG['backups']['max-local-backups']
 
@@ -111,6 +110,12 @@ class Backup:
                 for file in files:
                     abs_path = os.path.join(root, file)
                     relative_filename = str(abs_path).replace(root_path, "")                    
+                    
+                    # try:
+                    #     if not any(re.search(regex, abs_path) for regex in ignore_regex):
+                    #         print(abs_path)
+                    # except Exception as e:
+                    #     pass         
 
                     if not any(re.search(regex, abs_path) for regex in ignore_regex):
                         if self.save_relative:
@@ -125,12 +130,13 @@ class Backup:
                         if self.debug and self.showIgnored: 
                             # cprint(f"&c{relative_filename} is being ignored")
                             text_output += f"&c{relative_filename} ignored\n"
-                        log += f"- {abs_path}\n"
+                        if 'node_modules' not in abs_path:
+                            log += f"- {abs_path}\n"
                         
                     if self.debug and text_output.count('\n') % 25 == 0:
                         cprint(text_output)
                         text_output = ""
-
+                            
         self.zip_file.close()
 
         # save log to backups folder self.log_filename

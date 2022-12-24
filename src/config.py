@@ -3,7 +3,7 @@ import json
 import os
 from os.path import dirname as parentDir
 
-FILE = f"{parentDir(__file__)}/secret.json"
+FILE = f"{parentDir(parentDir(__file__))}/secret.json"
 try:
     with open(FILE) as f:
         CONFIG = json.load(f)             
