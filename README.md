@@ -6,6 +6,9 @@ It requires just some configuration, the storage box account information, and a 
 ## Installation
 
 ```sh
+git clone https://github.com/Reecepbcups/hetzner-storage-backup.git
+cd hetzner-storage-backup
+
 # install required dependencies
 python3 -m pip install -r requirements.txt
 
