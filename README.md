@@ -7,6 +7,7 @@ It requires just some configuration, the storage box account information, and a 
 
 ```sh
 git clone https://github.com/Reecepbcups/hetzner-storage-backup.git
+# git clone git@github.com:Reecepbcups/hetzner-storage-backup.git
 cd hetzner-storage-backup
 
 # install required dependencies
