@@ -7,7 +7,7 @@ from backup import Backup
 
 __version__ = "0.0.1"
 
-print(f"Backup Run")
+print(f"Backup Running...")
 b = Backup(debug=True)
 b.zip_files()
 b.send_file_to_sftp_server()
