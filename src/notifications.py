@@ -1,6 +1,7 @@
-from discord_webhook import DiscordWebhook, DiscordEmbed
+from discord_webhook import DiscordEmbed, DiscordWebhook
 
 from config import CONFIG
+
 
 def discord_notification(url="", title="", description="", color="ffffff", values={}, imageLink="", footerText=""):
     if CONFIG['discord-webhook-enable'] != True:

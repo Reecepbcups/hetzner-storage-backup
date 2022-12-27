@@ -1,19 +1,18 @@
-from config import CONFIG
-from cosmetics import cprint
-
-from system import getStorageAmount, getRamUsage, getCurrentHostname
-
-from notifications import discord_notification
-
-from pymongo import MongoClient
-
-from datetime import datetime
-import zipfile
-import pysftp
+import os
+import re
 import shutil
 import time
-import re
-import os
+import zipfile
+from datetime import datetime
+
+import pysftp
+from pymongo import MongoClient
+
+from config import CONFIG
+from cosmetics import cprint
+from notifications import discord_notification
+from system import getCurrentHostname, getRamUsage, getStorageAmount
+
 
 def getBackupConfig() -> dict:
     backup_data = CONFIG['backups']
@@ -38,6 +37,7 @@ class Backup:
             cprint("&cNo backup section in config, grab example from 'secret.json.example'")
             exit(0)
 
+
         self.root_paths = CONFIG['backups']['parent-paths']        
         self.backup_path = CONFIG['backups']['save-location']
         self.max_local_backups = CONFIG['backups']['max-local-backups']
@@ -53,8 +53,7 @@ class Backup:
         self.save_relative = CONFIG['backups']['save-relative']
                 
         self.zipfilename = f"{getCurrentHostname()}_{self.current_time}.zip"
-        self.backup_file_name = os.path.join(self.backup_path, self.zipfilename)
-        # self.log_filename = os.path.join(self.backup_path, f"{getCurrentHostname()}_{self.current_time}.log")
+        self.backup_file_name = os.path.join(self.backup_path, self.zipfilename)        
         
 
     def backup_mongodb(self, mongoDBConfig):
@@ -130,10 +129,10 @@ class Backup:
                             text_output += f"&a{relative_filename}\n"
                         log += f"+ {abs_path}\n"
                     else:
-                        if self.debug and self.showIgnored: 
-                            # cprint(f"&c{relative_filename} is being ignored")
+                        if self.debug and self.showIgnored:
                             if 'node_modules' not in abs_path:
                                 text_output += f"&c{relative_filename} ignored\n"
+
                         if 'node_modules' not in abs_path:
                             log += f"- {abs_path}\n"
                         
@@ -142,10 +141,6 @@ class Backup:
                         text_output = ""
                             
         self.zip_file.close()
-
-        # save log to backups folder self.log_filename. Pretty sure this breaks cleaning up old files
-        # with open(self.log_filename, 'w') as f:
-        #     f.write(log)            
         
         # delete folder self.mongodb_abs_location
         if(mongoConfig['enabled']):
@@ -165,8 +160,8 @@ class Backup:
                 "To Hetzner": [str(CONFIG['backups']['hetzner-sftp']['enabled']), True],
                 "MongoDB": [str(mongoConfig['enabled']), True],
                 "Directories": ['\n'.join(self.root_paths.keys()), False],
-                "Storage": [f"Total: {size} - Free: {free} - Used: {used} ({storagePercent})", False],
-                "RAM": [f"Total: {totalRam} - UsedRam: {usedRam} ({round(float(percentUsed), 2)}%)", False],                
+                "Storage": [f"{used}/{size} ({storagePercent} used) - Free: {free}", False],
+                "RAM": [f"{usedRam}/{totalRam} ({round(float(percentUsed), 1)}% used)", False],                
             }
 
             time_passed = (datetime.now() - datetime.strptime(self.current_time, TIME_FORMAT)).seconds
@@ -182,7 +177,7 @@ class Backup:
             )                  
 
     # Requires a Hetzner Storage Box (sftp, $3/Month for 1TB)    
-    def send_file_to_sftp_server(self):  
+    def send_file_to_sftp_server(self):
         hetzner = CONFIG['backups']['hetzner-sftp']
         REMOTE_BACKUP_DIR = hetzner['remote-dir']
         if not hetzner['enabled']: 

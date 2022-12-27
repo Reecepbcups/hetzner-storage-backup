@@ -1,8 +1,5 @@
 import os
-import shlex
-import datetime
-import subprocess
-import sys
+
 
 def getStorageAmount():
     storage = os.popen("""df -h / | grep /""").read().strip().split()

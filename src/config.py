@@ -1,6 +1,5 @@
 # May be easier to just put all config locations in here to reduce complexity of config.yml having some & here having 1.
 import json
-import os
 from os.path import dirname as parentDir
 
 FILE = f"{parentDir(parentDir(__file__))}/secret.json"
