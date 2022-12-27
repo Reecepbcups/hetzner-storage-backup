@@ -25,6 +25,7 @@ cp secret.json.example secret.json
 # EDITOR=nano crontab -e
 0 2 * * * /usr/bin/python3 /root/hetzner-storage-backup/src/main.py
 
+# Times are in UTC (6am UTC = 12am CST)
 # Run every night at 2am:            0 2 * * *
 # Sunday at 1AM:                     0 1 * * 0
 # First day of the month at 3:20PM: 20 15 1 * *
