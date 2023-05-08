@@ -79,14 +79,19 @@ class Backup:
 
     def delete_oldest_files_in_dir_if_over_max(self):
         # Remove oldest backup so we don't store too many
-        list_of_backups = os.listdir(self.backup_path)         
+        list_of_backups = os.listdir(self.backup_path)
 
         if len(list_of_backups) > self.max_local_backups:
             for i in range(len(list_of_backups) - self.max_local_backups):
-                full_paths = [f"{os.path.join(self.backup_path, x)}" for x in os.listdir(self.backup_path)]                
+                full_paths = [f"{os.path.join(self.backup_path, x)}" for x in os.listdir(self.backup_path)]
                 oldest_file = min(full_paths, key=os.path.getctime)
-                os.remove(oldest_file)
-                cprint(f"&cRemoved {oldest_file} as it was the oldest backup")
+
+                if os.path.isdir(oldest_file):
+                    shutil.rmtree(oldest_file)
+                    cprint(f"&cRemoved {oldest_file} as it was the oldest backup directory")
+                else:
+                    os.remove(oldest_file)
+                    cprint(f"&cRemoved {oldest_file} as it was the oldest backup file")
 
     def zip_files(self):
         # ! IMPORTANT: Switch to https://pypi.org/project/aiozipstream/
