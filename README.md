@@ -11,6 +11,7 @@ git clone https://github.com/Reecepbcups/hetzner-storage-backup.git
 cd hetzner-storage-backup
 
 # install required dependencies
+# apt install python-pip3
 python3 -m pip install -r requirements.txt
 
 # copy the default file to the new config file you edit
