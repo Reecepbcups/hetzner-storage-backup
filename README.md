@@ -11,8 +11,11 @@ git clone https://github.com/Reecepbcups/hetzner-storage-backup.git
 cd hetzner-storage-backup
 
 # install required dependencies
-# apt install python-pip3
+# sudo apt-get -y install python3-pip
 python3 -m pip install -r requirements.txt
+
+# Change your hostname if you want different notification names
+hostnamectl set-hostname new-hostname
 
 # copy the default file to the new config file you edit
 cp secret.json.example secret.json
